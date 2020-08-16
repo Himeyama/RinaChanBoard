@@ -10,24 +10,39 @@ public partial class DotGenerator : MonoBehaviour{
     int[] faceState = new int[]{0, 0, 0};
     // float speed = 1.5f;
     float mabataki = 10;
-    bool bgmode = true;
+    bool bgMode = true;
+    float bgTime = 0;
+    bool bgFlag = true;
 
     void Start(){
     }
 
-    bool bFaceState(int[] newFace){
-        return newFace[0] == faceState[0] &&
-            newFace[1] == faceState[1] &&
-            newFace[2] == faceState[2];
+    void Update(){
+        time += Time.deltaTime;
+        if(Input.GetMouseButton(0)){
+            bgTime += Time.deltaTime;
+            if(bgTime > 3 && bgFlag){
+                Camera.main.backgroundColor = bgMode ? Color.black : Color.white;
+                bgMode = !bgMode;
+                bgFlag = false;
+            }
+        }else{
+            bgFlag = true;
+            bgTime = 0;
+        }
+        
+        normalMode();
+        // randomFace();
     }
 
-    void Update(){
-        if(Input.GetMouseButtonDown(0)){
-            Camera.main.backgroundColor = bgmode ? Color.black : Color.white;
-            bgmode = !bgmode;
-        }
+    // void randomFace(){
+    //     int e = (int)Random.Range(0, 9);
+    //     int m = (int)Random.Range(0, 10);
+    //     int c = (int)Random.Range(0, 3);
+    //     faceDisplay(new int[]{e, m, c});
+    // }
 
-        time += Time.deltaTime;
+    void normalMode(){
         if(mabataki < time){
             faceDisplay(new int[]{3, 1, 0});
             if(mabataki < time - 0.08f){
@@ -61,21 +76,17 @@ public partial class DotGenerator : MonoBehaviour{
         dots.RemoveAll(e => true);
     }
 
-    List<int> getFace(int[] face){
-        List<int> font = new List<int>{};
-        for(int j = 0; j < 16; j++)
-            font.Add(
-                DotGenerator.eyes[face[0], j] | 
-                DotGenerator.mouse[face[1], j] | 
-                DotGenerator.mouse[face[2], j]
-            );
-        return font;
-    }
-
     void faceDisplay(int[] face){
-        if(!bFaceState(face)){
+        // 顔表示
+        if(!(face[0] == faceState[0] && face[1] == faceState[1] && face[2] == faceState[2])){
             reset();
-            List<int> f = getFace(face);
+            List<int> f = new List<int>{};
+            for(int i = 0; i < 16; i++)
+                f.Add(
+                    DotGenerator.eyes[face[0], i] | 
+                    DotGenerator.mouse[face[1], i] | 
+                    DotGenerator.mouse[face[2], i]
+                );
             List<int[]> faced = decode(f);
             for(int i = 0; i < faced.Count; i++){
                 GameObject go = Instantiate(dot) as GameObject;
