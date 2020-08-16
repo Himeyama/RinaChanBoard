@@ -18,8 +18,10 @@ function click(){
                     data[i] |= 1
                 }
             }
+            if(data[i])
+                data[i] = "0x"+(data[i]).toString(16)
         }
-        document.getElementById("data").innerText = data
+        document.getElementById("data").innerText = data.join(", ")
     }
 }
 click()
